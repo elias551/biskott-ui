@@ -1,0 +1,5 @@
+declare module "network-address"
+declare module "simple-concat"
+declare module "srt-to-vtt"
+declare module "opensubtitles-api"
+declare module "vlc-command"
