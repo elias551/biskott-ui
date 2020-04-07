@@ -1,14 +1,14 @@
 import { Server } from "http"
 import path from "path"
 
-import { DispatchAction } from "@/@types/global"
-import { isVideo } from "@/utils/fileHelper"
-import { loadSubtitle } from "@/utils/subtitles"
-import { getStats, getMovieHash } from "@/utils/torrent"
-
 import networkAddress from "network-address"
 import OpenSubtitles from "opensubtitles-api"
 import WebTorrent from "webtorrent"
+
+import { DispatchAction } from "@/@types"
+import { isVideo } from "@/utils/fileHelper"
+import { loadSubtitle } from "@/utils/subtitles"
+import { getStats, getMovieHash } from "@/utils/torrent"
 
 const client = new WebTorrent()
 

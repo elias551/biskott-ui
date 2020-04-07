@@ -13,6 +13,7 @@ interface ISearchPlugin {
 interface PluginDescription {
   name: string
   url: string
+  description: string
 }
 
 interface SearchQuery {

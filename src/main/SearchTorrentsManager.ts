@@ -1,6 +1,6 @@
-import { DispatchAction, SearchQuery } from "@/@types/global"
-
 import fetch from "node-fetch"
+
+import { DispatchAction, SearchQuery } from "@/@types"
 
 export class SearchTorrentsManager {
   constructor(private dispatch: DispatchAction) {}

@@ -1,10 +1,10 @@
-import { SearchResult } from "@/@types/global"
+import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos"
+import React, { useContext, useState } from "react"
+
+import { SearchResult } from "@/@types"
 
 import { ElectronContext } from "./contexts/ElectronContext"
 import { RouterContext } from "./contexts/RouterContext"
-
-import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos"
-import React, { useContext, useState } from "react"
 
 export const PlayerPage = () => {
   const { sendMessage, serverInfo, subtitles } = useContext(ElectronContext)
@@ -63,7 +63,7 @@ export const PlayerPage = () => {
   )
 }
 
-export const PlayerToolBar: React.FC<{ searchResult: SearchResult }> = ({
+export const PlayerTitleBar: React.FC<{ searchResult: SearchResult }> = ({
   searchResult,
 }) => {
   const { sendMessage, status } = useContext(ElectronContext)

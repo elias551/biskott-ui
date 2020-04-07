@@ -3,11 +3,10 @@ export const isTorrentLink = (value: string) =>
   value.startsWith("http://") ||
   value.startsWith("https://")
 
-import { TorrentStatus } from "@/@types/global"
-
-import moment from "moment"
 import OpenSubtitles from "opensubtitles-api"
 import { Torrent, TorrentFile } from "webtorrent"
+
+import { TorrentStatus } from "@/@types"
 
 export function getStats(torrent: Torrent): TorrentStatus {
   // Peers
@@ -17,20 +16,6 @@ export function getStats(torrent: Torrent): TorrentStatus {
   const percent = Math.round(torrent.progress * 100 * 100) / 100
   const downloaded = prettyBytes(torrent.downloaded)
   const total = prettyBytes(torrent.length)
-
-  // Remaining time
-  let remaining
-  if (torrent.done) {
-    remaining = "Done."
-  } else {
-    remaining = moment
-      .duration(torrent.timeRemaining / 1000, "seconds")
-      .humanize()
-    remaining =
-      remaining[0].toUpperCase() + remaining.substring(1) + " remaining."
-  }
-
-  // Speed rates
   const downloadSpeed = prettyBytes(torrent.downloadSpeed) + "/s"
   const uploadSpeed = prettyBytes(torrent.uploadSpeed) + "/s"
   return {

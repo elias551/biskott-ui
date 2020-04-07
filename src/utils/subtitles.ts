@@ -1,8 +1,8 @@
-import { SubtitleDescription } from "@/@types/global"
-
 import LanguageDetect from "languagedetect"
 import concat from "simple-concat"
 import srtToVtt from "srt-to-vtt"
+
+import { SubtitleDescription } from "@/@types"
 
 export const loadSubtitle = (stream: NodeJS.ReadableStream, fileName: string) =>
   new Promise<SubtitleDescription>((resolve, reject) => {

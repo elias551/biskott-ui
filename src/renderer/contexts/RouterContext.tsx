@@ -1,6 +1,6 @@
-import { SearchResult } from "@/@types/global"
+import React, { useState, useMemo, useCallback, useEffect } from "react"
 
-import React, { useState, useMemo } from "react"
+import { SearchResult } from "@/@types"
 
 type Page =
   | { name: "search" }
@@ -9,6 +9,8 @@ type Page =
 
 interface ContextValue {
   page: Page
+  isMenuOpen: boolean
+  toggleMenu: () => void
   setPage: (page: Page) => void
 }
 
@@ -16,8 +18,20 @@ export const RouterContext = React.createContext({} as ContextValue)
 
 export const RouterProvider: React.FC = ({ children }) => {
   const [page, setPage] = useState<Page>({ name: "search" })
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
 
-  const state = useMemo(() => ({ page, setPage }), [page, setPage])
+  useEffect(() => {
+    setIsMenuOpen(false)
+  }, [page])
+
+  const toggleMenu = useCallback(() => setIsMenuOpen(!isMenuOpen), [isMenuOpen])
+  const state = useMemo(() => ({ page, setPage, isMenuOpen, toggleMenu }), [
+    page,
+    setPage,
+    isMenuOpen,
+    toggleMenu,
+  ])
+
   return (
     <RouterContext.Provider value={state}>{children}</RouterContext.Provider>
   )

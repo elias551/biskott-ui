@@ -1,3 +1,6 @@
+import { IpcRendererEvent } from "electron"
+import React, { useReducer, useEffect, useContext } from "react"
+
 import {
   TorrentStatus,
   TorrentServerInfo,
@@ -6,12 +9,9 @@ import {
   ClientAppAction,
   ElectronAppEvent,
   TorrentSummary,
-} from "@/@types/global"
+} from "@/@types"
 
 import { RouterContext } from "./RouterContext"
-
-import { IpcRendererEvent } from "electron"
-import React, { useReducer, useEffect, useContext } from "react"
 
 interface IdleStatus {
   status: "idle"

@@ -1,11 +1,11 @@
 import path from "path"
 import url from "url"
 
-import { ClientAppAction } from "@/@types/global"
+import { app, BrowserWindow, ipcMain } from "electron"
+
+import { ClientAppAction } from "@/@types"
 
 import { AppEventManager } from "./AppEventManager"
-
-import { app, BrowserWindow, ipcMain } from "electron"
 
 app.allowRendererProcessReuse = true
 const gotTheLock = app.requestSingleInstanceLock()

@@ -1,9 +1,9 @@
 import cp from "child_process"
 import path from "path"
 
-import { DispatchAction } from "@/@types/global"
-
 import vlcCommand from "vlc-command"
+
+import { DispatchAction } from "@/@types"
 
 export class ExternalPlayerManager {
   constructor(private dispatch: DispatchAction) {}

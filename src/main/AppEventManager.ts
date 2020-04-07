@@ -1,4 +1,4 @@
-import { ClientAppAction, DispatchAction } from "@/@types/global"
+import { ClientAppAction, DispatchAction } from "@/@types"
 import { isTorrentLink } from "@/utils/torrent"
 
 import { ExternalPlayerManager } from "./ExternalPlayerManager"

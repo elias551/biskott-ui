@@ -1,13 +1,13 @@
-import { SearchResult } from "@/@types/global"
+import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos"
+import PlayArrowIcon from "@material-ui/icons/PlayArrow"
+import React, { useContext, useEffect, useState } from "react"
+
+import { SearchResult } from "@/@types"
 import { isVideo } from "@/utils/fileHelper"
 
 import { Spinner } from "./Spinner"
 import { ElectronContext } from "./contexts/ElectronContext"
 import { RouterContext } from "./contexts/RouterContext"
-
-import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos"
-import PlayArrowIcon from "@material-ui/icons/PlayArrow"
-import React, { useContext, useEffect, useState } from "react"
 
 export const DetailsPage = () => {
   const { sendMessage, torrentSummary } = useContext(ElectronContext)
@@ -128,7 +128,7 @@ export const DetailsPage = () => {
   )
 }
 
-export const DetailsToolBar: React.FC<{ searchResult: SearchResult }> = ({
+export const DetailsTitleBar: React.FC<{ searchResult: SearchResult }> = ({
   searchResult,
 }) => {
   const { setPage } = useContext(RouterContext)
