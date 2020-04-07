@@ -6,6 +6,11 @@ declare global {
   }
 }
 
+interface UserConfig {
+  plugins: { [url: string]: PluginDescription }
+  defaultSearchPlugin: string
+}
+
 interface ISearchPlugin {
   search(query: SearchQuery): Promise<SearchResult[]>
 }
@@ -73,6 +78,10 @@ type SearchTorrentsAppEvent =
       type: "search-torrents-loading"
     }
   | {
+      type: "config-loaded"
+      userConfig: UserConfig
+    }
+  | {
       type: "search-torrents-loaded"
       results: SearchResult[]
     }
@@ -121,6 +130,9 @@ type ElectronAppEvent =
 
 type ClientAppAction =
   | {
+      type: "front-ready"
+    }
+  | {
       type: "play-torrent"
       fileIndex: number
     }
@@ -147,4 +159,12 @@ type ClientAppAction =
     }
   | {
       type: "close-app"
+    }
+  | {
+      type: "save-plugin"
+      pluginDescription: PluginDescription
+    }
+  | {
+      type: "set-search-plugin"
+      url: string
     }

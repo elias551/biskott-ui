@@ -10,9 +10,9 @@ export const AppRouter = () => {
   const { page } = useContext(RouterContext)
   return (
     <>
-      {page.name === "player" && <PlayerPage />}
       {page.name === "search" && <SearchPage />}
       {page.name === "details" && <DetailsPage />}
+      {page.name === "player" && <PlayerPage />}
     </>
   )
 }

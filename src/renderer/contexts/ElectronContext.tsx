@@ -9,6 +9,7 @@ import {
   ClientAppAction,
   ElectronAppEvent,
   TorrentSummary,
+  PluginDescription,
 } from "@/@types"
 
 import { RouterContext } from "./RouterContext"
@@ -31,9 +32,13 @@ interface ErrorStatus {
   message: string
 }
 
-type Loadable<T> = IdleStatus | LoadingStatus | LoadedStatus<T> | ErrorStatus
+export type Loadable<T> =
+  | IdleStatus
+  | LoadingStatus
+  | LoadedStatus<T>
+  | ErrorStatus
 
-const Loadable = {
+export const Loadable = {
   idle: { status: "idle" } as IdleStatus,
   loading: { status: "loading" } as LoadingStatus,
   loaded<T>(value: T) {
@@ -50,6 +55,9 @@ interface TorrentManagerState {
   status?: TorrentStatus
   serverInfo?: TorrentServerInfo
   subtitles?: SubtitleDescription[]
+  searchPlugins: Loadable<{ [url: string]: PluginDescription }>
+  activePlugin?: PluginDescription
+
   sendMessage: (data: ClientAppAction) => void
 }
 
@@ -60,8 +68,9 @@ export const ElectronContext = React.createContext<TorrentManagerState>(
 export const getElectronProvider = (
   sendMessage: (data: ClientAppAction) => void
 ) => {
-  const initialState: TorrentManagerState = {
+  const initialState = {
     searchResults: Loadable.loaded([]),
+    searchPlugins: Loadable.idle,
     torrentSummary: Loadable.idle,
     sendMessage,
   }
@@ -74,6 +83,14 @@ export const getElectronProvider = (
         data: ElectronAppEvent
       ): TorrentManagerState => {
         switch (data.type) {
+          case "config-loaded":
+            console.log(data)
+            return {
+              ...state,
+              activePlugin:
+                data.userConfig.plugins[data.userConfig.defaultSearchPlugin],
+              searchPlugins: Loadable.loaded(data.userConfig.plugins),
+            }
           case "torrent-stopped":
             return {
               ...state,

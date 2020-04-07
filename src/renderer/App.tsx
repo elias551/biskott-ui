@@ -1,31 +1,39 @@
 import CheckBoxOutlineBlankSharpIcon from "@material-ui/icons/CheckBoxOutlineBlankSharp"
 import CloseIcon from "@material-ui/icons/Close"
 import MinimizeIcon from "@material-ui/icons/Minimize"
-import React, { useContext } from "react"
+import React, { useContext, useEffect } from "react"
 
 import { TitleBarRouter, AppRouter, SideMenuRouter } from "./AppRouter"
 import { MenuButton } from "./MenuButton"
 import { ElectronContext } from "./contexts/ElectronContext"
 import { RouterContext } from "./contexts/RouterContext"
 
-export const App = () => (
-  <div
-    style={{
-      display: "flex",
-      flexDirection: "column",
-      height: "100vh",
-      position: "relative",
-    }}
-  >
-    <TitleBar />
+export const App = () => {
+  const { sendMessage } = useContext(ElectronContext)
 
-    <div style={{ flexGrow: 1, overflowY: "auto", position: "relative" }}>
-      <AppRouter />
+  useEffect(() => {
+    sendMessage({ type: "front-ready" })
+  }, [])
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100vh",
+        position: "relative",
+      }}
+    >
+      <TitleBar />
+
+      <div style={{ flexGrow: 1, overflowY: "auto", position: "relative" }}>
+        <AppRouter />
+      </div>
+
+      <SideMenu />
     </div>
-
-    <SideMenu />
-  </div>
-)
+  )
+}
 
 const TitleBar = () => {
   const { sendMessage } = useContext(ElectronContext)
