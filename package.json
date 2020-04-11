@@ -1,6 +1,6 @@
 {
   "name": "biskott",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Pre-configured boilerplate for Electron + React + TypeScript",
   "main": "./dist/main.bundle.js",
   "scripts": {
@@ -31,7 +31,7 @@
         ]
       }
     },
-    "buildVersion": "0.1.0"
+    "buildVersion": "0.1.1"
   },
   "author": "Elias Platek",
   "license": "MIT",
