@@ -8,8 +8,7 @@ export class SearchTorrentsManager {
   async search(query: SearchQuery) {
     this.dispatch({
       type: "search-torrents-loading",
-      userInput: query.term,
-      page: query.page,
+      query: query,
     })
     try {
       this.dispatch({
@@ -23,11 +22,32 @@ export class SearchTorrentsManager {
       })
     }
   }
+
+  async getNextPage(query: SearchQuery) {
+    const searhQuery = { ...query, page: query.page + 1 }
+    this.dispatch({
+      type: "search-torrents-next-page-loading",
+      query: searhQuery,
+    })
+    try {
+      this.dispatch({
+        type: "search-torrents-next-page-loaded",
+        results: await fetch(buildSearchUrl(searhQuery)).then((r) => r.json()),
+      })
+    } catch (error) {
+      this.dispatch({
+        type: "search-torrents-next-page-error",
+        message: error?.message || error,
+      })
+    }
+  }
 }
 
-const buildSearchUrl = ({ pluginUrl, term, page }: SearchQuery) => {
+const buildSearchUrl = ({ page, pluginUrl, userInput }: SearchQuery) => {
   if (!pluginUrl) {
     throw new Error("No url provided")
   }
-  return `${pluginUrl}/search?&page=${page}&term=${encodeURIComponent(term)}`
+  return `${pluginUrl}/search?&page=${page}&term=${encodeURIComponent(
+    userInput
+  )}`
 }

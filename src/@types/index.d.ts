@@ -11,6 +11,11 @@ interface UserConfig {
   defaultSearchPlugin: string
 }
 
+export interface SearchQuery {
+  userInput: string
+  page: number
+  pluginUrl: string
+}
 interface ISearchPlugin {
   search(query: SearchQuery): Promise<SearchResult[]>
 }
@@ -19,12 +24,6 @@ interface PluginDescription {
   name: string
   url: string
   description: string
-}
-
-interface SearchQuery {
-  pluginUrl: string
-  term: string
-  page: number
 }
 
 interface SubtitleDescription {
@@ -76,8 +75,7 @@ interface TorrentSummary {
 type SearchTorrentsAppEvent =
   | {
       type: "search-torrents-loading"
-      userInput: string
-      page: number
+      query: SearchQuery
     }
   | {
       type: "search-torrents-loaded"
@@ -85,6 +83,20 @@ type SearchTorrentsAppEvent =
     }
   | {
       type: "search-torrents-error"
+      message: string
+    }
+
+type SearchTorrentsNextPageAppEvent =
+  | {
+      type: "search-torrents-next-page-loading"
+      query: SearchQuery
+    }
+  | {
+      type: "search-torrents-next-page-loaded"
+      results: SearchResult[]
+    }
+  | {
+      type: "search-torrents-next-page-error"
       message: string
     }
 
@@ -124,6 +136,7 @@ type ElectronAppEvent =
       userConfig: UserConfig
     }
   | SearchTorrentsAppEvent
+  | SearchTorrentsNextPageAppEvent
   | {
       type: "subtitles"
       subtitles: SubtitleDescription[]
@@ -140,6 +153,10 @@ type ClientAppAction =
     }
   | {
       type: "search-torrents"
+      query: SearchQuery
+    }
+  | {
+      type: "search-torrents-next-page"
       query: SearchQuery
     }
   | {

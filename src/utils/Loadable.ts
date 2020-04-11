@@ -16,7 +16,7 @@ interface ErrorStatus {
   message: string
 }
 
-export type Loadable<T> =
+export type Loadable<T = void> =
   | IdleStatus
   | LoadingStatus
   | LoadedStatus<T>

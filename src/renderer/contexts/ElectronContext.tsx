@@ -9,20 +9,17 @@ import {
   ElectronAppEvent,
   TorrentSummary,
   PluginDescription,
+  SearchQuery,
 } from "@/@types"
 import { Loadable } from "@/utils/Loadable"
 
 import { useExternalEventHandler } from "../useExternalEventHandler"
 
-interface UserSearchOptions {
-  userInput: string
-  page: number
-}
-
 interface TorrentManagerState {
   searchResults: Loadable<SearchResult[]>
+  nextResults: Loadable
   linkSearch?: SearchResult
-  searchOptions: UserSearchOptions
+  searchQuery: SearchQuery
   torrentSummary: Loadable<TorrentSummary>
   status?: TorrentStatus
   serverInfo?: TorrentServerInfo
@@ -37,9 +34,10 @@ export const ElectronContext = React.createContext<TorrentManagerState>(
   {} as TorrentManagerState
 )
 
-const emptySearchOptions: UserSearchOptions = {
+const emptySearchQuery: SearchQuery = {
   userInput: "",
   page: 1,
+  pluginUrl: "",
 }
 
 export const getElectronProvider = (
@@ -47,9 +45,10 @@ export const getElectronProvider = (
 ) => {
   const initialState: TorrentManagerState = {
     searchResults: Loadable.idle,
-    searchOptions: emptySearchOptions,
+    searchQuery: emptySearchQuery,
     searchPlugins: Loadable.idle,
     torrentSummary: Loadable.idle,
+    nextResults: Loadable.idle,
     sendMessage,
   }
 
@@ -101,10 +100,7 @@ const reducer = (
         ...state,
         searchResults: Loadable.loading,
         linkSearch: undefined,
-        searchOptions: {
-          userInput: data.userInput,
-          page: data.page,
-        },
+        searchQuery: data.query,
       }
     case "search-torrents-loaded":
       return {
@@ -115,6 +111,27 @@ const reducer = (
       return {
         ...state,
         searchResults: Loadable.error(data.message),
+      }
+    case "search-torrents-next-page-loading":
+      return {
+        ...state,
+        searchQuery: data.query,
+        nextResults: Loadable.loading,
+      }
+    case "search-torrents-next-page-loaded":
+      return {
+        ...state,
+        searchResults: Loadable.loaded(
+          state.searchResults.status === "loaded"
+            ? [...state.searchResults.value, ...data.results]
+            : data.results
+        ),
+        nextResults: Loadable.idle,
+      }
+    case "search-torrents-next-page-error":
+      return {
+        ...state,
+        nextResults: Loadable.error(data.message),
       }
     case "subtitles":
       return { ...state, subtitles: data.subtitles }

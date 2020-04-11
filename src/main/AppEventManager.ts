@@ -31,14 +31,17 @@ export class AppEventManager {
         this.configManager.setSearchPlugin(data.url)
         break
       case "search-torrents":
-        if (isTorrentLink(data.query.term)) {
+        if (isTorrentLink(data.query.userInput)) {
           this.dispatch({
             type: "torrent-search-link",
-            url: data.query.term,
+            url: data.query.userInput,
           })
           break
         }
         this.searchTorrentsManager.search(data.query)
+        break
+      case "search-torrents-next-page":
+        this.searchTorrentsManager.getNextPage(data.query)
         break
       case "show-details":
         this.torrentManager.getTorrentSummary(data.url)

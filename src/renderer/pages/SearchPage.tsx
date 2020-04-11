@@ -1,4 +1,5 @@
-import React, { useContext, useState, useEffect, useMemo } from "react"
+import React, { useContext, useState, useEffect, useMemo, useRef } from "react"
+import { useIntersectionObserver } from "react-intersection-observer-hook"
 
 import { SearchResult, PluginDescription } from "@/@types"
 
@@ -6,9 +7,10 @@ import { MovieCard } from "../MovieCard"
 import { Spinner } from "../Spinner"
 import { ElectronContext } from "../contexts/ElectronContext"
 import { RouterContext } from "../contexts/RouterContext"
+import { useScrollTop } from "../useScrollPosition"
 
 export const SearchPage = () => {
-  const { searchResults, linkSearch } = useContext(ElectronContext)
+  const { searchResults, linkSearch, nextResults } = useContext(ElectronContext)
   const { setPage } = useContext(RouterContext)
 
   const [initialLinkSearch] = useState(linkSearch)
@@ -19,66 +21,120 @@ export const SearchPage = () => {
     }
   }, [linkSearch])
 
+  const wrapperRef = useRef<HTMLDivElement>(null)
+
+  const scrollTop = useScrollTop(wrapperRef.current)
+
+  const [isReady, setIsReady] = useState(false)
+
+  useEffect(() => {
+    if (wrapperRef.current) {
+      const scrollTopValue = (window as any).searchscrollTop
+      wrapperRef.current.scrollTop = scrollTopValue
+      setIsReady(true)
+    }
+  }, [wrapperRef.current])
+
+  useEffect(() => {
+    if (!isReady) {
+      return
+    }
+    ;(window as any).searchscrollTop = scrollTop
+  }, [scrollTop, isReady])
+
   const showDetails = (searchResult: SearchResult) => {
     setPage({ name: "details", searchResult })
   }
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexWrap: "wrap",
-        justifyContent: "space-evenly",
-      }}
-    >
-      {searchResults.status === "loading" && <Spinner />}
-      {searchResults.status === "loaded" && (
-        <>
-          {searchResults.value.length === 0 && "No results"}
-          {searchResults.value.map((result, i) => (
-            <MovieCard
-              key={i}
-              onClick={() => showDetails(result)}
-              searchResult={result}
-            />
-          ))}
-        </>
+    <div ref={wrapperRef} style={{ overflowY: "auto", height: "100%" }}>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "space-evenly",
+        }}
+      >
+        {searchResults.status === "loading" && <Spinner />}
+        {searchResults.status === "loaded" && (
+          <>
+            {searchResults.value.length === 0 && "No results"}
+            {searchResults.value.map((result, i) => (
+              <MovieCard
+                key={i}
+                onClick={() => showDetails(result)}
+                searchResult={result}
+              />
+            ))}
+            <NextButton />
+          </>
+        )}
+        {searchResults.status === "error"
+          ? "Error: " + searchResults.message
+          : undefined}
+      </div>
+      {nextResults.status === "loading" && (
+        <div style={{ width: "100%" }}>
+          <Spinner />
+        </div>
       )}
-      {searchResults.status === "error"
-        ? "Error: " + searchResults.message
-        : undefined}
     </div>
   )
 }
 
-export const SearchTitleBar = () => {
-  const {
-    sendMessage,
-    searchResults,
-    activePlugin,
-    searchOptions,
-  } = useContext(ElectronContext)
+const NextButton = () => {
+  const { sendMessage, searchQuery, activePlugin, nextResults } = useContext(
+    ElectronContext
+  )
 
-  const [previousPlugin] = useState(activePlugin)
-  const [userInput, setUserInput] = useState(searchOptions.userInput)
+  const showNextPage = () => {
+    if (!activePlugin || nextResults.status === "loading") {
+      return
+    }
+    sendMessage({
+      type: "search-torrents-next-page",
+      query: searchQuery,
+    })
+  }
+  const [buttonRef, { entry }] = useIntersectionObserver()
+
+  useEffect(() => {
+    if (entry?.isIntersecting) {
+      showNextPage()
+    }
+  }, [entry?.isIntersecting])
+
+  return <div ref={buttonRef}></div>
+}
+
+export const SearchTitleBar = () => {
+  const { sendMessage, searchResults, activePlugin, searchQuery } = useContext(
+    ElectronContext
+  )
+
+  const [userInput, setUserInput] = useState(searchQuery.userInput)
   const searchMovies = () => {
     if (!activePlugin) {
       return
     }
     sendMessage({
       type: "search-torrents",
-      query: { term: userInput, page: 1, pluginUrl: activePlugin.url },
+      query: { userInput: userInput, page: 1, pluginUrl: activePlugin.url },
     })
   }
 
   useEffect(() => {
-    if (!activePlugin || previousPlugin?.url === activePlugin.url) {
+    if (!activePlugin || searchQuery.pluginUrl === activePlugin.url) {
       return
     }
     setUserInput("")
     sendMessage({
       type: "search-torrents",
-      query: { term: "", page: 1, pluginUrl: activePlugin.url },
+      query: {
+        pluginUrl: activePlugin.url,
+        userInput: "",
+        page: 1,
+      },
     })
   }, [activePlugin])
 
