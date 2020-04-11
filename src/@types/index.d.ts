@@ -184,6 +184,10 @@ type ClientAppAction =
       pluginDescription: PluginDescription
     }
   | {
+      type: "remove-plugin"
+      url: string
+    }
+  | {
       type: "set-search-plugin"
       url: string
     }

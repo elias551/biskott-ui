@@ -27,6 +27,9 @@ export class AppEventManager {
       case "save-plugin":
         this.configManager.saveSearchPlugin(data.pluginDescription)
         break
+      case "remove-plugin":
+        this.configManager.removeSearchPlugin(data.url)
+        break
       case "set-search-plugin":
         this.configManager.setSearchPlugin(data.url)
         break

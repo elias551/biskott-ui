@@ -1,3 +1,4 @@
+import SearchIcon from "@material-ui/icons/Search"
 import React, { useContext, useState, useEffect, useMemo, useRef } from "react"
 import { useIntersectionObserver } from "react-intersection-observer-hook"
 
@@ -175,7 +176,7 @@ export const SearchMenu = () => {
     PluginDescription
   >()
 
-  const [pluginUrl, setPluginUrl] = useState("http://localhost:1337/yts/v1")
+  const [pluginUrl, setPluginUrl] = useState("")
   const [errorMessage, setErrorMessage] = useState<string>()
   const loadPlugin = async () => {
     if (searchPlugins.status !== "loaded") {
@@ -210,6 +211,10 @@ export const SearchMenu = () => {
     [pluginDescription]
   )
 
+  if (searchPlugins.status !== "loaded") {
+    return <Spinner />
+  }
+
   const addPlugin = () => {
     if (!pluginDescription || !isValid) {
       return
@@ -220,35 +225,49 @@ export const SearchMenu = () => {
     })
   }
 
-  if (searchPlugins.status !== "loaded") {
-    return <Spinner />
+  const removePlugin = () => {
+    if (!activePlugin) {
+      return
+    }
+    sendMessage({
+      type: "remove-plugin",
+      url: activePlugin.url,
+    })
   }
 
+  const plugins = Object.values(searchPlugins.value) || []
+
   return (
-    <div>
-      <div>
-        <select
-          style={{
-            border: "1px solid rgba(0,0,0,.5)",
-            background: "rgba(0,0,0,.25)",
-            color: "white",
-            padding: 10,
-          }}
-          value={activePlugin?.url}
-          onChange={(e) => selectSearchEngine(e.target.value)}
-        >
-          {Object.values(searchPlugins.value).map(
-            (plugin: PluginDescription) => (
+    <div style={{ margin: 5, fontSize: 16 }}>
+      {plugins.length ? (
+        <div>
+          <h2>Active plugin</h2>
+          <select
+            style={{
+              border: "1px solid rgba(0,0,0,.5)",
+              background: "rgba(0,0,0,.25)",
+              color: "white",
+              width: "100%",
+              padding: 10,
+            }}
+            value={activePlugin?.url}
+            onChange={(e) => selectSearchEngine(e.target.value)}
+          >
+            {plugins.map((plugin: PluginDescription) => (
               <option value={plugin.url} key={plugin.url}>
                 {plugin.name}
               </option>
-            )
-          )}
-        </select>
-      </div>
-      <div>
-        <pre>{JSON.stringify(activePlugin, null, 2)}</pre>
-      </div>
+            ))}
+          </select>
+        </div>
+      ) : undefined}
+      {activePlugin && (
+        <div>
+          <div>{activePlugin.description}</div>
+          <div>{activePlugin.url}</div>
+          <button onClick={removePlugin}>Remove</button>
+        </div>
+      )}
       <h2>Add plugin</h2>
       <div style={{ display: "flex", width: "100%" }}>
         <div style={{ flexGrow: 1 }}>
@@ -257,10 +276,12 @@ export const SearchMenu = () => {
             value={pluginUrl}
             placeholder="Type plugin url to add"
             onChange={(e) => setPluginUrl(e.target.value)}
-            style={{ width: "100%" }}
+            style={{ width: "100%", padding: "10px 2px" }}
           />
         </div>
-        <button onClick={loadPlugin}>Find</button>
+        <button onClick={loadPlugin}>
+          <SearchIcon style={{ pointerEvents: "none" }} />
+        </button>
       </div>
       <pre>{JSON.stringify(pluginDescription, null, 2)}</pre>
       {errorMessage && <div>{errorMessage}</div>}

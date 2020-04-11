@@ -42,6 +42,21 @@ export class ConfigManager {
     this.dispatch({ type: "config-loaded", userConfig: newConfig })
   }
 
+  async removeSearchPlugin(pluginUrl: string) {
+    const config = await this.readConfigFromFile()
+    const newConfig = {
+      ...config,
+      plugins: { ...config.plugins },
+    }
+
+    delete newConfig.plugins[pluginUrl]
+    if (newConfig.defaultSearchPlugin === pluginUrl) {
+      newConfig.defaultSearchPlugin = Object.keys(newConfig.plugins)[0]
+    }
+    this.saveConfig(newConfig)
+    this.dispatch({ type: "config-loaded", userConfig: newConfig })
+  }
+
   async setSearchPlugin(url: string) {
     const config = await this.readConfigFromFile()
     const newConfig = { ...config, defaultSearchPlugin: url }
