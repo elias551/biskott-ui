@@ -5,15 +5,16 @@ import { App } from "./App"
 import { getElectronProvider } from "./contexts/ElectronContext"
 import { RouterProvider } from "./contexts/RouterContext"
 
-const ElectronProvider = getElectronProvider((data) =>
-  window.ipcRenderer.send("ClientAppAction", data)
-)
+const ElectronProvider = getElectronProvider((data) => {
+  console.log("CLIENT -> APP", data)
+  return window.ipcRenderer.send("ClientAppAction", data)
+})
 
 ReactDOM.render(
-  <RouterProvider>
-    <ElectronProvider>
+  <ElectronProvider>
+    <RouterProvider>
       <App />
-    </ElectronProvider>
-  </RouterProvider>,
+    </RouterProvider>
+  </ElectronProvider>,
   document.getElementById("app")
 )

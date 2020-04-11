@@ -8,6 +8,8 @@ export class SearchTorrentsManager {
   async search(query: SearchQuery) {
     this.dispatch({
       type: "search-torrents-loading",
+      userInput: query.term,
+      page: query.page,
     })
     try {
       this.dispatch({

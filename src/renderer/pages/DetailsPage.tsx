@@ -5,9 +5,9 @@ import React, { useContext, useEffect, useState } from "react"
 import { SearchResult } from "@/@types"
 import { isVideo } from "@/utils/fileHelper"
 
-import { Spinner } from "./Spinner"
-import { ElectronContext } from "./contexts/ElectronContext"
-import { RouterContext } from "./contexts/RouterContext"
+import { Spinner } from "../Spinner"
+import { ElectronContext } from "../contexts/ElectronContext"
+import { RouterContext } from "../contexts/RouterContext"
 
 export const DetailsPage = () => {
   const { sendMessage, torrentSummary } = useContext(ElectronContext)
@@ -37,20 +37,25 @@ export const DetailsPage = () => {
   }
 
   return (
-    <div
-      style={{
-        backgroundImage:
-          searchResult.background && `url('${searchResult.background}')`,
-        backgroundSize: "cover",
-        height: "100%",
-        fontSize: 16,
-      }}
-    >
+    <>
+      <div
+        style={{
+          backgroundImage:
+            searchResult.background && `url('${searchResult.background}')`,
+          backgroundSize: "cover",
+          height: "100%",
+          width: "100%",
+          position: "absolute",
+        }}
+      />
       <div
         style={{
           display: "flex",
           flexDirection: "column",
           height: "100%",
+          position: "absolute",
+          overflowY: "auto",
+          fontSize: 16,
         }}
       >
         <div style={{ display: "flex", margin: 15 }}>
@@ -80,16 +85,17 @@ export const DetailsPage = () => {
                 </option>
               ))}
             </select>
+            <input
+              type="text"
+              value={searchResult.torrents[selectedTorrentIndex].url}
+              style={{ width: "100%", maxWidth: 300 }}
+              readOnly={true}
+            />
           </div>
           {torrentSummary.status === "loading" && <Spinner />}
           {torrentSummary.status === "loaded" &&
             torrentSummary.value.files.length > 0 && (
               <div>
-                <input
-                  type="text"
-                  value={torrentSummary.value.url}
-                  style={{ width: "100%", maxWidth: 300 }}
-                />
                 <ul>
                   {torrentSummary.value.files.map((file) => (
                     <li
@@ -124,7 +130,7 @@ export const DetailsPage = () => {
             )}
         </div>
       </div>
-    </div>
+    </>
   )
 }
 
@@ -133,7 +139,9 @@ export const DetailsTitleBar: React.FC<{ searchResult: SearchResult }> = ({
 }) => {
   const { setPage } = useContext(RouterContext)
 
-  const backToSearch = () => setPage({ name: "search" })
+  const backToSearch = () => {
+    return setPage({ name: "search" })
+  }
 
   return (
     <div

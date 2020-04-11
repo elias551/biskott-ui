@@ -39,11 +39,13 @@ if (!gotTheLock) {
 
     const appEventManager = new AppEventManager((eventData) => {
       if (mainWindow && !mainWindow.isDestroyed()) {
+        console.log("APP -> CLIENT", eventData)
         mainWindow.webContents.send("ElectronAppEvent", eventData)
       }
     })
 
     const onClientAction = (event: any, data: ClientAppAction) => {
+      console.log("CLIENT -> APP", data)
       switch (data.type) {
         case "minimize-window":
           mainWindow?.minimize()

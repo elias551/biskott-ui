@@ -1,10 +1,10 @@
 import React, { useContext } from "react"
 
-import { DetailsPage, DetailsTitleBar } from "./DetailsPage"
 import { MenuButton } from "./MenuButton"
-import { PlayerPage, PlayerTitleBar } from "./PlayerPage"
-import { SearchPage, SearchTitleBar, SearchMenu } from "./SearchPage"
 import { RouterContext } from "./contexts/RouterContext"
+import { DetailsPage, DetailsTitleBar } from "./pages/DetailsPage"
+import { PlayerPage, PlayerTitleBar } from "./pages/PlayerPage"
+import { SearchPage, SearchTitleBar, SearchMenu } from "./pages/SearchPage"
 
 export const AppRouter = () => {
   const { page } = useContext(RouterContext)

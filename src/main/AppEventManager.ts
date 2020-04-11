@@ -36,7 +36,6 @@ export class AppEventManager {
             type: "torrent-search-link",
             url: data.query.term,
           })
-          this.torrentManager.getTorrentSummary(data.query.term)
           break
         }
         this.searchTorrentsManager.search(data.query)

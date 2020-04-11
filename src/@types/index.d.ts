@@ -76,10 +76,8 @@ interface TorrentSummary {
 type SearchTorrentsAppEvent =
   | {
       type: "search-torrents-loading"
-    }
-  | {
-      type: "config-loaded"
-      userConfig: UserConfig
+      userInput: string
+      page: number
     }
   | {
       type: "search-torrents-loaded"
@@ -120,6 +118,10 @@ type ElectronAppEvent =
   | {
       type: "server-ready"
       serverInfo: TorrentServerInfo
+    }
+  | {
+      type: "config-loaded"
+      userConfig: UserConfig
     }
   | SearchTorrentsAppEvent
   | {

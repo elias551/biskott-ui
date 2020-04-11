@@ -2,14 +2,22 @@ import React, { useContext, useState, useEffect, useMemo } from "react"
 
 import { SearchResult, PluginDescription } from "@/@types"
 
-import { MovieCard } from "./MovieCard"
-import { Spinner } from "./Spinner"
-import { ElectronContext } from "./contexts/ElectronContext"
-import { RouterContext } from "./contexts/RouterContext"
+import { MovieCard } from "../MovieCard"
+import { Spinner } from "../Spinner"
+import { ElectronContext } from "../contexts/ElectronContext"
+import { RouterContext } from "../contexts/RouterContext"
 
 export const SearchPage = () => {
-  const { searchResults } = useContext(ElectronContext)
+  const { searchResults, linkSearch } = useContext(ElectronContext)
   const { setPage } = useContext(RouterContext)
+
+  const [initialLinkSearch] = useState(linkSearch)
+
+  useEffect(() => {
+    if (linkSearch && linkSearch !== initialLinkSearch) {
+      showDetails(linkSearch)
+    }
+  }, [linkSearch])
 
   const showDetails = (searchResult: SearchResult) => {
     setPage({ name: "details", searchResult })
@@ -44,10 +52,15 @@ export const SearchPage = () => {
 }
 
 export const SearchTitleBar = () => {
-  const { sendMessage, searchResults, activePlugin } = useContext(
-    ElectronContext
-  )
-  const [userInput, setUserInput] = useState("")
+  const {
+    sendMessage,
+    searchResults,
+    activePlugin,
+    searchOptions,
+  } = useContext(ElectronContext)
+
+  const [previousPlugin] = useState(activePlugin)
+  const [userInput, setUserInput] = useState(searchOptions.userInput)
   const searchMovies = () => {
     if (!activePlugin) {
       return
@@ -59,7 +72,7 @@ export const SearchTitleBar = () => {
   }
 
   useEffect(() => {
-    if (!activePlugin) {
+    if (!activePlugin || previousPlugin?.url === activePlugin.url) {
       return
     }
     setUserInput("")
@@ -92,12 +105,9 @@ export const SearchTitleBar = () => {
 }
 
 export const SearchMenu = () => {
-  const {
-    searchResults,
-    sendMessage,
-    searchPlugins,
-    activePlugin,
-  } = useContext(ElectronContext)
+  const { sendMessage, searchPlugins, activePlugin } = useContext(
+    ElectronContext
+  )
 
   const selectSearchEngine = (searchEngineUrl: string) => {
     if (searchPlugins.status === "loaded") {

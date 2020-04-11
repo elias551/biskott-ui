@@ -3,8 +3,8 @@ import React, { useContext, useState } from "react"
 
 import { SearchResult } from "@/@types"
 
-import { ElectronContext } from "./contexts/ElectronContext"
-import { RouterContext } from "./contexts/RouterContext"
+import { ElectronContext } from "../contexts/ElectronContext"
+import { RouterContext } from "../contexts/RouterContext"
 
 export const PlayerPage = () => {
   const { sendMessage, serverInfo, subtitles } = useContext(ElectronContext)
