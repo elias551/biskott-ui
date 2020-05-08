@@ -24,6 +24,9 @@ interface PluginDescription {
   name: string
   url: string
   description: string
+  authentication?: {
+    publicKey: string
+  }
 }
 
 interface SubtitleDescription {

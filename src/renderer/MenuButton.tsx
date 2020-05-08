@@ -17,7 +17,7 @@ export const MenuButton = () => {
         alignItems: "center",
       }}
     >
-      <MenuIcon style={{ pointerEvents: "none" }} />
+      <MenuIcon />
     </div>
   )
 }

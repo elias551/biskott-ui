@@ -3,22 +3,18 @@ import React from "react"
 import { SearchResult } from "@/@types"
 
 interface Props {
-  onClick: () => void
   searchResult: SearchResult
 }
 
 export const MovieCard: React.FC<Props> = ({
-  onClick,
-  searchResult: result,
+  searchResult: { title, poster },
 }) => (
-  <div className="search-result" onClick={onClick}>
-    <div style={{ pointerEvents: "none", overflow: "hidden" }}>
-      <div className="title">{result.title}</div>
-      {result.poster && (
-        <div className="image">
-          <img src={result.poster} style={{ width: "100%" }} />
-        </div>
-      )}
-    </div>
+  <div className="movie-card">
+    <div className="title">{title}</div>
+    {poster && (
+      <div className="image">
+        <img src={poster} />
+      </div>
+    )}
   </div>
 )

@@ -93,7 +93,7 @@ export const PlayerTitleBar: React.FC<{ searchResult: SearchResult }> = ({
           cursor: "pointer",
         }}
       >
-        <ArrowBackIosIcon style={{ pointerEvents: "none" }} /> <span>Back</span>
+        <ArrowBackIosIcon /> <span>Back</span>
       </div>
       {status && (
         <span>

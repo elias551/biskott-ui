@@ -1,5 +1,7 @@
+import AddIcon from "@material-ui/icons/Add"
+import RemoveIcon from "@material-ui/icons/Remove"
 import SearchIcon from "@material-ui/icons/Search"
-import React, { useContext, useState, useEffect, useMemo, useRef } from "react"
+import React, { useContext, useState, useEffect, useMemo } from "react"
 import { useIntersectionObserver } from "react-intersection-observer-hook"
 
 import { SearchResult, PluginDescription } from "@/@types"
@@ -8,10 +10,17 @@ import { MovieCard } from "../MovieCard"
 import { Spinner } from "../Spinner"
 import { ElectronContext } from "../contexts/ElectronContext"
 import { RouterContext } from "../contexts/RouterContext"
-import { useScrollTop } from "../useScrollPosition"
+import { useSavedScrollPosition } from "../hooks/useSavedScrollPosition"
 
 export const SearchPage = () => {
-  const { searchResults, linkSearch, nextResults } = useContext(ElectronContext)
+  const {
+    searchResults,
+    linkSearch,
+    nextResults,
+    activePlugin,
+    sendMessage,
+    searchQuery,
+  } = useContext(ElectronContext)
   const { setPage } = useContext(RouterContext)
 
   const [initialLinkSearch] = useState(linkSearch)
@@ -22,71 +31,11 @@ export const SearchPage = () => {
     }
   }, [linkSearch])
 
-  const wrapperRef = useRef<HTMLDivElement>(null)
-
-  const scrollTop = useScrollTop(wrapperRef.current)
-
-  const [isReady, setIsReady] = useState(false)
-
-  useEffect(() => {
-    if (wrapperRef.current) {
-      const scrollTopValue = (window as any).searchscrollTop
-      wrapperRef.current.scrollTop = scrollTopValue
-      setIsReady(true)
-    }
-  }, [wrapperRef.current])
-
-  useEffect(() => {
-    if (!isReady) {
-      return
-    }
-    ;(window as any).searchscrollTop = scrollTop
-  }, [scrollTop, isReady])
+  const scrollingRef = useSavedScrollPosition("search-movies")
 
   const showDetails = (searchResult: SearchResult) => {
     setPage({ name: "details", searchResult })
   }
-
-  return (
-    <div ref={wrapperRef} style={{ overflowY: "auto", height: "100%" }}>
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          justifyContent: "space-evenly",
-        }}
-      >
-        {searchResults.status === "loading" && <Spinner />}
-        {searchResults.status === "loaded" && (
-          <>
-            {searchResults.value.length === 0 && "No results"}
-            {searchResults.value.map((result, i) => (
-              <MovieCard
-                key={i}
-                onClick={() => showDetails(result)}
-                searchResult={result}
-              />
-            ))}
-            <NextButton />
-          </>
-        )}
-        {searchResults.status === "error"
-          ? "Error: " + searchResults.message
-          : undefined}
-      </div>
-      {nextResults.status === "loading" && (
-        <div style={{ width: "100%" }}>
-          <Spinner />
-        </div>
-      )}
-    </div>
-  )
-}
-
-const NextButton = () => {
-  const { sendMessage, searchQuery, activePlugin, nextResults } = useContext(
-    ElectronContext
-  )
 
   const showNextPage = () => {
     if (!activePlugin || nextResults.status === "loading") {
@@ -97,13 +46,47 @@ const NextButton = () => {
       query: searchQuery,
     })
   }
+
+  return (
+    <div ref={scrollingRef} style={{ overflowY: "auto", height: "100%" }}>
+      <div className="search-results-grid">
+        {searchResults.status === "loading" && <Spinner />}
+        {searchResults.status === "loaded" && (
+          <>
+            {searchResults.value.length === 0 && "No results"}
+            {searchResults.value.map((result, i) => (
+              <div
+                key={i}
+                className="search-result"
+                onClick={() => showDetails(result)}
+              >
+                <MovieCard searchResult={result} />
+              </div>
+            ))}
+            <NextButton onFetchNext={showNextPage} />
+            {nextResults.status === "loading" && (
+              <div className="search-result">
+                <Spinner />
+              </div>
+            )}
+          </>
+        )}
+        {searchResults.status === "error"
+          ? "Error: " + searchResults.message
+          : undefined}
+      </div>
+    </div>
+  )
+}
+
+const NextButton: React.FC<{ onFetchNext: () => void }> = ({ onFetchNext }) => {
   const [buttonRef, { entry }] = useIntersectionObserver()
 
   useEffect(() => {
     if (entry?.isIntersecting) {
-      showNextPage()
+      onFetchNext()
     }
-  }, [entry?.isIntersecting])
+  }, [entry, onFetchNext])
 
   return <div ref={buttonRef}></div>
 }
@@ -223,6 +206,8 @@ export const SearchMenu = () => {
       type: "save-plugin",
       pluginDescription,
     })
+    setPluginDescription(undefined)
+    setPluginUrl("")
   }
 
   const removePlugin = () => {
@@ -265,7 +250,18 @@ export const SearchMenu = () => {
         <div>
           <div>{activePlugin.description}</div>
           <div>{activePlugin.url}</div>
-          <button onClick={removePlugin}>Remove</button>
+          <button onClick={removePlugin}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <RemoveIcon />
+              <div>Remove</div>
+            </div>
+          </button>
         </div>
       )}
       <h2>Add plugin</h2>
@@ -280,15 +276,27 @@ export const SearchMenu = () => {
           />
         </div>
         <button onClick={loadPlugin}>
-          <SearchIcon style={{ pointerEvents: "none" }} />
+          <SearchIcon />
         </button>
       </div>
-      <pre>{JSON.stringify(pluginDescription, null, 2)}</pre>
       {errorMessage && <div>{errorMessage}</div>}
       {pluginDescription && (
-        <button onClick={addPlugin} disabled={!isValid}>
-          Add
-        </button>
+        <div>
+          <h3>{pluginDescription.name}</h3>
+          <div>{pluginDescription.description}</div>
+          <button onClick={addPlugin} disabled={!isValid}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <AddIcon />
+              <div>Add</div>
+            </div>
+          </button>
+        </div>
       )}
     </div>
   )

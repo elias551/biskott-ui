@@ -5,15 +5,18 @@
       "jsx": true,
       "useJSXTextNode": true
     },
-     "plugins": [
+      "plugins": [
       "@typescript-eslint",
       "prettier",
-      "react"
+      "react",
+      "react-hooks"
     ],
     "extends": [
       "plugin:prettier/recommended",
       "plugin:import/warnings",
-      "plugin:import/typescript"
+      "plugin:import/typescript",
+      "plugin:react/recommended",
+      "plugin:react-hooks/recommended"
     ],
     "rules": {
       "prettier/prettier": ["error"],
@@ -36,8 +39,14 @@
           }
         }
       ],
-      // "import/no-unused-modules": [1, { "unusedExports": true }],
-      "import/no-named-as-default": [0]
+      "import/no-unused-modules": [1, { "unusedExports": true }],
+      "import/no-named-as-default": [0],
+      "react/prop-types": [0]
+    },
+    "settings": {
+      "react": {
+        "version": "detect"
+      }
     }
   }
-  
+    

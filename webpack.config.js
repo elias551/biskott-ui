@@ -10,36 +10,10 @@ function srcPaths(src) {
 const isEnvProduction = process.env.NODE_ENV === "production"
 const isEnvDevelopment = process.env.NODE_ENV === "development"
 
-const babelOptions = {
-  cacheDirectory: true,
-  presets: [
-    "@babel/env",
-    "@babel/preset-react",
-    [
-      "@babel/preset-typescript",
-      {
-        allExtensions: true,
-        isTSX: true,
-      },
-    ],
-  ],
-  plugins: [
-    "@babel/plugin-syntax-dynamic-import",
-    "@babel/proposal-class-properties",
-    "@babel/proposal-object-rest-spread",
-    [
-      "@babel/plugin-transform-runtime",
-      {
-        regenerator: true,
-      },
-    ],
-  ],
-}
-
 const getCommonConfig = () => ({
   devtool: isEnvDevelopment ? "inline-source-map" : false,
   mode: isEnvProduction ? "production" : "development",
-  output: { path: srcPaths("dist") },
+  output: { path: srcPaths("build") },
   node: { __dirname: false, __filename: false },
   resolve: {
     alias: {
@@ -51,15 +25,10 @@ const getCommonConfig = () => ({
     rules: [
       {
         test: /\.tsx?$/,
-        loader: "babel-loader",
+        loader: "@sucrase/webpack-loader",
         exclude: /node_modules/,
-        options: babelOptions,
-      },
-      {
-        test: /\.(jpg|png|svg|ico|icns)$/,
-        loader: "file-loader",
         options: {
-          name: "[path][name].[ext]",
+          transforms: ["jsx", "typescript"],
         },
       },
     ],
@@ -67,11 +36,8 @@ const getCommonConfig = () => ({
 })
 
 const buildConfig = ({ entry, target, outputFilename, plugins }) => {
-  const result = getCommonConfig()
-  result.entry = entry
-  result.target = target
+  const result = { ...getCommonConfig(), entry, target, plugins }
   result.output.filename = outputFilename
-  result.plugins = plugins
 
   return result
 }
@@ -79,13 +45,13 @@ const buildConfig = ({ entry, target, outputFilename, plugins }) => {
 const mainConfig = buildConfig({
   entry: "./src/main/main.ts",
   target: "electron-main",
-  outputFilename: "main.bundle.js",
+  outputFilename: "index.js",
   plugins: [
     new CopyPkgJsonPlugin({
       remove: ["scripts", "devDependencies", "build"],
       replace: {
-        main: "./main.bundle.js",
-        scripts: { start: "electron ./main.bundle.js" },
+        main: "./index.js",
+        scripts: { start: "electron ./index.js" },
         postinstall: "electron-builder install-app-deps",
       },
     }),
@@ -97,7 +63,12 @@ const rendererConfig = buildConfig({
   entry: "./src/renderer/index.tsx",
   target: "electron-renderer",
   outputFilename: "renderer.bundle.js",
-  plugins: [new CopyPlugin([{ from: "./index.html", to: "index.html" }])],
+  plugins: [
+    new CopyPlugin([
+      { from: "./static/index.html", to: "index.html" },
+      { from: "./static/styles.css", to: "styles.css" },
+    ]),
+  ],
 })
 
 module.exports = [mainConfig, rendererConfig]

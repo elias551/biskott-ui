@@ -25,7 +25,7 @@ export const DetailsPage = () => {
         url: searchResult.torrents[selectedTorrentIndex].url,
       })
     }
-  }, [searchResult, selectedTorrentIndex])
+  }, [searchResult, selectedTorrentIndex, sendMessage])
 
   if (!searchResult) {
     return <Spinner />
@@ -75,20 +75,36 @@ export const DetailsPage = () => {
         </div>
         <div style={{ margin: 15 }}>
           <div>
-            <select
-              value={selectedTorrentIndex}
-              onChange={(e) => setSelectedTorrentIndex(+e.target.value)}
+            <div
+              style={{ display: "flex", flexDirection: "row", margin: "5px 0" }}
             >
               {searchResult.torrents.map((t, i) => (
-                <option key={t.url} value={i}>
-                  {t.quality} (Seeders: {t.seeders}, Leechers: {t.leechers})
-                </option>
+                <div
+                  key={t.url}
+                  onClick={() => setSelectedTorrentIndex(i)}
+                  className="action-button"
+                  style={{
+                    background:
+                      selectedTorrentIndex === i ? "#292929" : undefined,
+                    cursor: selectedTorrentIndex === i ? "default" : undefined,
+                    marginRight: 5,
+                  }}
+                >
+                  {t.quality} (S: {t.seeders}, L: {t.leechers})
+                </div>
               ))}
-            </select>
+            </div>
+          </div>
+          <div style={{ margin: "10px 0 20px 0" }}>
             <input
               type="text"
               value={searchResult.torrents[selectedTorrentIndex].url}
-              style={{ width: "100%", maxWidth: 300 }}
+              style={{
+                width: "100%",
+                background: "transparent",
+                border: "transparent",
+                color: "white",
+              }}
               readOnly={true}
             />
           </div>
@@ -96,36 +112,34 @@ export const DetailsPage = () => {
           {torrentSummary.status === "loaded" &&
             torrentSummary.value.files.length > 0 && (
               <div>
-                <ul>
-                  {torrentSummary.value.files.map((file) => (
-                    <li
-                      key={file.fileIndex}
-                      style={{ marginBottom: 5, wordBreak: "break-all" }}
+                {torrentSummary.value.files.map((file) => (
+                  <div
+                    key={file.fileIndex}
+                    style={{ marginBottom: 5, wordBreak: "break-all" }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "row",
+                        alignItems: "center",
+                      }}
                     >
                       {file.fileName}
                       {isVideo(file.fileName) && (
-                        <button
+                        <div
                           onClick={() => playTorrent(file.fileIndex)}
-                          style={{
-                            marginLeft: 5,
-                            width: 30,
-                            height: 30,
-                            borderRadius: 15,
-                            backgroundColor: "#171717",
-                            color: "white",
-                            border: "none",
-                            cursor: "pointer",
-                          }}
+                          className="action-button"
+                          style={{ marginLeft: 5 }}
                         >
-                          <PlayArrowIcon
-                            fontSize="inherit"
-                            style={{ pointerEvents: "none" }}
-                          />
-                        </button>
+                          <span className="action-button-icon">
+                            <PlayArrowIcon fontSize="inherit" />
+                          </span>
+                          <span>Play</span>
+                        </div>
                       )}
-                    </li>
-                  ))}
-                </ul>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
         </div>
@@ -153,7 +167,7 @@ export const DetailsTitleBar: React.FC<{ searchResult: SearchResult }> = ({
       }}
     >
       <span onClick={backToSearch} style={{ cursor: "pointer" }}>
-        <ArrowBackIosIcon style={{ pointerEvents: "none" }} />
+        <ArrowBackIosIcon />
       </span>
       <span style={{ fontSize: 16 }}>{searchResult.title}</span>
     </div>

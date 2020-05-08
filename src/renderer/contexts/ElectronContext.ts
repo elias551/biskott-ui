@@ -56,10 +56,10 @@ export const getElectronProvider = (
     const [state, dispatch] = useReducer(reducer, initialState)
     useExternalEventHandler(dispatch)
 
-    return (
-      <ElectronContext.Provider value={state}>
-        {children}
-      </ElectronContext.Provider>
+    return React.createElement(
+      ElectronContext.Provider,
+      { value: state },
+      children
     )
   }
   return ElectronProvider

@@ -32,7 +32,5 @@ export const RouterProvider: React.FC = ({ children }) => {
     toggleMenu,
   ])
 
-  return (
-    <RouterContext.Provider value={state}>{children}</RouterContext.Provider>
-  )
+  return React.createElement(RouterContext.Provider, { value: state }, children)
 }

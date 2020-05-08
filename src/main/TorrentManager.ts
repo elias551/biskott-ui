@@ -44,7 +44,7 @@ export class TorrentManager {
     }
 
     client.on("error", errorHandler)
-    client.add(url, (_torrent) => {
+    client.add(url, { path: "./data" }, (_torrent) => {
       if (errorHandler) {
         client.off("error", errorHandler)
       }
