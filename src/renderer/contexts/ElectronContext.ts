@@ -119,14 +119,19 @@ const reducer = (
         nextResults: Loadable.loading,
       }
     case "search-torrents-next-page-loaded":
+      const currentResults =
+        state.searchResults.status === "loaded" ? state.searchResults.value : []
+      const resultsToAdd = data.results.filter(
+        (r) =>
+          !currentResults.find((c) => c.torrents[0].url === r.torrents[0].url)
+      )
+      const results = [...currentResults, ...resultsToAdd]
       return {
         ...state,
-        searchResults: Loadable.loaded(
-          state.searchResults.status === "loaded"
-            ? [...state.searchResults.value, ...data.results]
-            : data.results
-        ),
-        nextResults: Loadable.idle,
+        searchResults: Loadable.loaded(results),
+        nextResults: resultsToAdd.length
+          ? Loadable.idle
+          : Loadable.error("No more results"),
       }
     case "search-torrents-next-page-error":
       return {

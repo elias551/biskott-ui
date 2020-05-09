@@ -63,12 +63,14 @@ export const SearchPage = () => {
                 <MovieCard searchResult={result} />
               </div>
             ))}
-            <NextButton onFetchNext={showNextPage} />
-            {nextResults.status === "loading" && (
+
+            {nextResults.status === "loading" ? (
               <div className="search-result">
                 <Spinner />
               </div>
-            )}
+            ) : nextResults.status === "idle" && searchResults.value.length ? (
+              <NextButton onFetchNext={showNextPage} />
+            ) : undefined}
           </>
         )}
         {searchResults.status === "error"
