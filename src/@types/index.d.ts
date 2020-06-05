@@ -15,6 +15,8 @@ export interface SearchQuery {
   userInput: string
   page: number
   pluginUrl: string
+  genre?: string
+  sortBy?: string
 }
 interface ISearchPlugin {
   search(query: SearchQuery): Promise<SearchResult[]>
@@ -24,9 +26,8 @@ interface PluginDescription {
   name: string
   url: string
   description: string
-  authentication?: {
-    publicKey: string
-  }
+  genres?: string[]
+  sortFilters?: string[]
 }
 
 interface SubtitleDescription {

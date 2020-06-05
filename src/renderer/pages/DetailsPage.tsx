@@ -166,9 +166,17 @@ export const DetailsTitleBar: React.FC<{ searchResult: SearchResult }> = ({
         marginLeft: 10,
       }}
     >
-      <span onClick={backToSearch} style={{ cursor: "pointer" }}>
+      <div
+        onClick={backToSearch}
+        style={{
+          cursor: "pointer",
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
         <ArrowBackIosIcon />
-      </span>
+      </div>
       <span style={{ fontSize: 16 }}>{searchResult.title}</span>
     </div>
   )

@@ -43,11 +43,19 @@ export class SearchTorrentsManager {
   }
 }
 
-const buildSearchUrl = ({ page, pluginUrl, userInput }: SearchQuery) => {
+const buildSearchUrl = ({
+  page,
+  pluginUrl,
+  userInput,
+  genre,
+  sortBy,
+}: SearchQuery) => {
   if (!pluginUrl) {
     throw new Error("No url provided")
   }
   return `${pluginUrl}/search?&page=${page}&term=${encodeURIComponent(
     userInput
+  )}&genre=${encodeURIComponent(genre || "")}&sortBy=${encodeURIComponent(
+    sortBy || ""
   )}`
 }

@@ -49,6 +49,7 @@ textarea,
 
 .menu-button-container-wrapper {
   -webkit-app-region: no-drag;
+  height: 100%;
 }
 
 .app-name-container {

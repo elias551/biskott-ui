@@ -21,7 +21,7 @@ export const TitleBarRouter = () => {
   const { page, isMenuOpen } = useContext(RouterContext)
 
   return (
-    <div style={{ display: "flex" }}>
+    <div style={{ display: "flex", height: "100%" }}>
       {page.name === "search" && <MenuButton />}
       {!isMenuOpen && (
         <>

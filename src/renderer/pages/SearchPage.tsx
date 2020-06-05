@@ -1,7 +1,14 @@
 import AddIcon from "@material-ui/icons/Add"
 import RemoveIcon from "@material-ui/icons/Remove"
 import SearchIcon from "@material-ui/icons/Search"
-import React, { useContext, useState, useEffect, useMemo } from "react"
+import React, {
+  useContext,
+  useState,
+  useEffect,
+  useMemo,
+  useRef,
+  useCallback,
+} from "react"
 import { useIntersectionObserver } from "react-intersection-observer-hook"
 
 import { SearchResult, PluginDescription } from "@/@types"
@@ -83,12 +90,13 @@ export const SearchPage = () => {
 
 const NextButton: React.FC<{ onFetchNext: () => void }> = ({ onFetchNext }) => {
   const [buttonRef, { entry }] = useIntersectionObserver()
-
+  const isSentRef = useRef(false)
   useEffect(() => {
-    if (entry?.isIntersecting) {
+    if (!isSentRef.current && entry?.isIntersecting) {
+      isSentRef.current = true
       onFetchNext()
     }
-  }, [entry, onFetchNext])
+  }, [isSentRef, entry, onFetchNext])
 
   return <div ref={buttonRef}></div>
 }
@@ -99,30 +107,33 @@ export const SearchTitleBar = () => {
   )
 
   const [userInput, setUserInput] = useState(searchQuery.userInput)
-  const searchMovies = () => {
-    if (!activePlugin) {
-      return
-    }
-    sendMessage({
-      type: "search-torrents",
-      query: { userInput: userInput, page: 1, pluginUrl: activePlugin.url },
-    })
-  }
+
+  const searchMovies = useCallback(
+    (term: string, genre?: string, sortBy?: string) => {
+      if (!activePlugin) {
+        return
+      }
+      sendMessage({
+        type: "search-torrents",
+        query: {
+          pluginUrl: activePlugin.url,
+          userInput: term,
+          genre,
+          page: 1,
+          sortBy,
+        },
+      })
+    },
+    [activePlugin, sendMessage]
+  )
 
   useEffect(() => {
     if (!activePlugin || searchQuery.pluginUrl === activePlugin.url) {
       return
     }
     setUserInput("")
-    sendMessage({
-      type: "search-torrents",
-      query: {
-        pluginUrl: activePlugin.url,
-        userInput: "",
-        page: 1,
-      },
-    })
-  }, [activePlugin])
+    searchMovies("", "", "")
+  }, [activePlugin, searchMovies, searchQuery.pluginUrl])
 
   return (
     <div style={{ display: "flex", flexWrap: "wrap" }}>
@@ -137,11 +148,47 @@ export const SearchTitleBar = () => {
           placeholder={`Search (${activePlugin?.name})`}
           type="text"
           value={userInput}
-          onKeyPress={(e) => (e.key === "Enter" ? searchMovies() : undefined)}
+          onKeyPress={(e) =>
+            e.key === "Enter"
+              ? searchMovies(userInput, searchQuery.genre, searchQuery.sortBy)
+              : undefined
+          }
           onChange={(e) => setUserInput(e.target.value)}
           disabled={searchResults.status === "loading"}
         ></input>
       </div>
+      {activePlugin?.genres ? (
+        <select
+          value={searchQuery.genre}
+          onChange={(e) => {
+            searchMovies(userInput, e.target.value, searchQuery.sortBy)
+          }}
+          disabled={searchResults.status === "loading"}
+        >
+          <option value="">All</option>
+          {activePlugin?.genres.map((genre) => (
+            <option key={genre} value={genre}>
+              {genre}
+            </option>
+          ))}
+        </select>
+      ) : undefined}
+      {activePlugin?.sortFilters ? (
+        <select
+          value={searchQuery.sortBy}
+          onChange={(e) => {
+            searchMovies(userInput, searchQuery.genre, e.target.value)
+          }}
+          disabled={searchResults.status === "loading"}
+        >
+          <option value="">Sort by...</option>
+          {activePlugin?.sortFilters.map((sortBy) => (
+            <option key={sortBy} value={sortBy}>
+              {sortBy}
+            </option>
+          ))}
+        </select>
+      ) : undefined}
     </div>
   )
 }
@@ -177,7 +224,7 @@ export const SearchMenu = () => {
       .then((r) => r.json())
       .then((r) => ({ ...r, url: pluginUrl }))
       .then(setPluginDescription)
-      .catch((e) => {
+      .catch(() => {
         setErrorMessage("Invalid url")
       })
   }

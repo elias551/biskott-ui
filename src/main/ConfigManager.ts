@@ -1,6 +1,8 @@
 import fs from "fs"
 import { promisify } from "util"
 
+import fetch from "node-fetch"
+
 import { DispatchAction, PluginDescription, UserConfig } from "@/@types"
 
 const CONFIG_FILE_PATH = "./app.config.json"
@@ -25,6 +27,22 @@ export class ConfigManager {
   }
 
   async loadConfig() {
+    const userConfig = await this.readConfigFromFile()
+
+    this.dispatch({
+      type: "config-loaded",
+      userConfig: userConfig,
+    })
+
+    await Promise.all(
+      Object.keys(userConfig.plugins).map((pluginUrl) =>
+        fetch(pluginUrl + "/announce")
+          .then((r) => r.json())
+          .then((r) => ({ ...r, url: pluginUrl } as PluginDescription))
+          .then(this.saveSearchPlugin.bind(this))
+          .catch(console.error)
+      )
+    )
     this.dispatch({
       type: "config-loaded",
       userConfig: await this.readConfigFromFile(),

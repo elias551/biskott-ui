@@ -52,7 +52,7 @@ export const getElectronProvider = (
     sendMessage,
   }
 
-  const ElectronProvider: React.FC = ({ children }) => {
+  return (({ children }) => {
     const [state, dispatch] = useReducer(reducer, initialState)
     useExternalEventHandler(dispatch)
 
@@ -61,8 +61,7 @@ export const getElectronProvider = (
       { value: state },
       children
     )
-  }
-  return ElectronProvider
+  }) as React.FC
 }
 
 const reducer = (
