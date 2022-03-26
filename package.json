@@ -69,7 +69,7 @@
     "eslint-plugin-react-hooks": "^3.0.0",
     "file-loader": "^6.0.0",
     "languagedetect": "^2.0.0",
-    "minimist": "^1.2.5",
+    "minimist": "^1.2.6",
     "mkdirp": "^1.0.4",
     "mocha": "^7.1.1",
     "network-address": "^1.1.2",
